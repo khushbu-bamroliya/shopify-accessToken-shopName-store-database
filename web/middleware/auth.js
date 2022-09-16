@@ -9,7 +9,7 @@ export default function applyAuthMiddleware(
   { billing = { required: false } } = { billing: { required: false } }
 ) {
   app.get("/api/auth", async (req, res) => {
-    return redirectToAuth(req, res, app)
+    return redirectToAuth(req, res, app);
   });
 
   app.get("/api/auth/callback", async (req, res) => {
@@ -19,12 +19,12 @@ export default function applyAuthMiddleware(
         res,
         req.query
       );
-      console.log('responses', session.accessToken)
+      console.log("responses", session.accessToken);
       const responses = await Shopify.Webhooks.Registry.registerAll({
         shop: session.shop,
         accessToken: session.accessToken,
       });
-console.log('responses 2', responses)
+      console.log("responses 2", responses);
       Object.entries(responses).map(([topic, response]) => {
         // The response from registerAll will include errors for the GDPR topics.  These can be safely ignored.
         // To register the GDPR topics, please set the appropriate webhook endpoint in the

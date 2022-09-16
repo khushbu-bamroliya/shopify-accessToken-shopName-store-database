@@ -1,5 +1,5 @@
 // @ts-check
-import connectDB from './database/db.js';
+import connectDB from "./database/db.js";
 import axios from "axios";
 import { join } from "path";
 import { readFileSync } from "fs";
@@ -14,6 +14,7 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
+import user from "./model/model.js";
 
 const USE_ONLINE_TOKENS = false;
 
@@ -64,7 +65,7 @@ const BILLING_SETTINGS = {
 setupGDPRWebHooks("/api/webhooks");
 
 // database connection
-connectDB('khushbu_bamroliya','khushi64')
+connectDB("khushbu_bamroliya", "khushi64");
 
 // export for test use only
 export async function createServer(
@@ -105,12 +106,29 @@ export async function createServer(
     })
   );
 
+  /// making shop api & store data in mongodb
+  app.get("/api/shop", async (req, res) => {
+    const { shop, accessToken } = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+    console.log("&&&", shop, accessToken);
+    const shopData = await user.create({
+      shop,
+      accessToken,
+    });
+    console.log("data :: ", shopData);
+    res.status(200).json(shopData);
+  });
+
   app.get("/api/products/count", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
       app.get("use-online-tokens")
     );
+
     const { Product } = await import(
       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
     );
@@ -125,6 +143,7 @@ export async function createServer(
       res,
       app.get("use-online-tokens")
     );
+
     let status = 200;
     let error = null;
 
@@ -144,6 +163,7 @@ export async function createServer(
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);
+
     if (Shopify.Context.IS_EMBEDDED_APP && shop) {
       res.setHeader(
         "Content-Security-Policy",
@@ -168,10 +188,7 @@ export async function createServer(
     app.use(serveStatic(PROD_INDEX_PATH, { index: false }));
   }
 
-  
-
   app.use("/*", async (req, res, next) => {
-
     if (typeof req.query.shop !== "string") {
       res.status(500);
       return res.send("No shop provided");
@@ -195,30 +212,13 @@ export async function createServer(
       "index.html"
     );
 
-   
-
     return res
       .status(200)
       .set("Content-Type", "text/html")
       .send(readFileSync(htmlFile));
   });
 
-  app.get('/data',async(req,res)=>{
-    console.log('first') 
-  });
- 
-
   return { app };
 }
 
 createServer().then(({ app }) => app.listen(PORT));
-
-
-// const URL = "https://demo-app-app.myshopify.com/admin/api/2021-10/shop.json";
-// const getUserApi = async () => {
-//   try {
-//     return await axios.get(`${URL}`);
-//   } catch (error) {
-//     console.log("error while calling get user api", error);
-//   }
-// };

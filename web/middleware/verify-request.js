@@ -50,6 +50,7 @@ export default function verifyRequest(
             session.accessToken
           );
           console.log('****',session.accessToken);
+          console.log('****', session.shop);
           await client.query({ data: TEST_GRAPHQL_QUERY });
         }
         return next();

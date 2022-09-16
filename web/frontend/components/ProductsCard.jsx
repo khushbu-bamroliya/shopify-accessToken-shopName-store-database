@@ -21,7 +21,8 @@ export function ProductsCard() {
     isLoading: isLoadingCount,
     isRefetching: isRefetchingCount,
   } = useAppQuery({
-    url: "/api/products/count",
+    // url: "/api/products/count",
+    url: "/api/shop",
     reactQueryOptions: {
       onSuccess: () => {
         setIsLoading(false);
@@ -48,6 +49,23 @@ export function ProductsCard() {
       });
     }
   };
+  
+  // api call 
+  // const handlePopulate2 = async () => {
+  //   setIsLoading(true);
+  //   const response = await fetch("/api/shop");
+  //   console.log('response',response)
+  //   if (response.ok) {
+  //     await refetchProductCount();
+  //     setToastProps({ content: "shop data" });
+  //   } else {
+  //     setIsLoading(false);
+  //     setToastProps({
+  //       content: "There was an error creating products",
+  //       error: true,
+  //     });
+  //   }
+  // };
 
   return (
     <>
@@ -56,7 +74,7 @@ export function ProductsCard() {
         title="Product Counter"
         sectioned
         primaryFooterAction={{
-          content: "Populate 5 products",
+          content: "Add 5 product",
           onAction: handlePopulate,
           loading: isLoading,
         }}

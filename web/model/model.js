@@ -1,10 +1,11 @@
 import mongoose from 'mongoose'
 
-const userSchema = mongoose.Schema({
-    name:String,
+const shopSchema = mongoose.Schema({
+   shop:String,
+   accessToken:String
     
 })
 
-const user = mongoose.model('shopData',userSchema)
+const user = mongoose.model('shop',shopSchema)
 
 export default user;
